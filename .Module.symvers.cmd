@@ -1,0 +1,1 @@
+cmd_/home/blackneo/OS/A3/procReport/Module.symvers := sed 's/\.ko$$/\.o/' /home/blackneo/OS/A3/procReport/modules.order | scripts/mod/modpost -m -a  -o /home/blackneo/OS/A3/procReport/Module.symvers -e -i Module.symvers   -T -
