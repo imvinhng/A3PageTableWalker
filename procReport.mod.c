@@ -28,12 +28,13 @@ MODULE_INFO(retpoline, "Y");
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
 	{ 0xf704969, "module_layout" },
-	{ 0x5b8239ca, "__x86_return_thunk" },
 	{ 0x92997ed8, "_printk" },
+	{ 0x5b8239ca, "__x86_return_thunk" },
+	{ 0xab0324d4, "init_task" },
 	{ 0xbdfb6dbb, "__fentry__" },
 };
 
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "FB9CD8034DB7730B2CB7C46");
+MODULE_INFO(srcversion, "DB212E7DDEA8DF878CC35AC");
