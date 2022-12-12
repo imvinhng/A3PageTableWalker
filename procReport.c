@@ -34,6 +34,10 @@ long virt2phys(struct mm_struct *mm, long vpage) {
   return physical_page_addr;
 }
 
+// void cont_pages(struct task_struct *task) {
+//   long current_page
+// }
+
 
 int proc_count(void){
   int i=0;
@@ -67,12 +71,12 @@ void proc_print(void) {
   struct task_struct *thechild;
   printk(KERN_INFO "PROCESS REPORT:");
   printk(KERN_INFO "proc_id, proc_name, contig_pages, noncontig_pages, total_pages");
-  // for_each_process(thechild){
-  //   if (thechild->pid > 650) {
-  //     printk("%d, %s, %d", thechild->pid, thechild->comm,
-  //       total_pages_calc(thechild));
-  //   }
-  // }
+  for_each_process(thechild){
+    if (thechild->pid > 650) {
+      printk("%d, %s, %d", thechild->pid, thechild->comm,
+        total_pages_calc(thechild));
+    }
+  }
   printk(KERN_INFO "TOTAL,,%d,%d,%d", 0, 0, 0);
 
 }
