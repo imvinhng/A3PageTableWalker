@@ -3,6 +3,12 @@
 #include<linux/pid_namespace.h>
 #include<asm/io.h>
 
+long contig_pages = 0;
+long noncontig_pages = 0;
+long total_contig_pages = 0;
+long total_noncontig_pages = 0;
+long total_pages = 0;
+
 long virt2phys(struct mm_struct *mm, long vpage) {
   long physical_page_addr = 0;
   pgd_t *pgd;
@@ -34,10 +40,6 @@ long virt2phys(struct mm_struct *mm, long vpage) {
   return physical_page_addr;
 }
 
-// void cont_pages(struct task_struct *task) {
-//   long current_page
-// }
-
 
 int proc_count(void){
   int i=0;
@@ -58,11 +60,28 @@ int total_pages_calc(struct task_struct *task) {
   int totalPageCount = 0;
   struct vm_area_struct *vma = 0;
   unsigned long vpage;
-  if (task->mm && task->mm->mmap)
-    for (vma = task->mm->mmap; vma; vma = vma->vm_next)
-      for (vpage = vma->vm_start; vpage < vma->vm_end; vpage += PAGE_SIZE)
-        if (virt2phys(task->mm, vpage) != 0)
+  unsigned long prev_page = 0;
+  if (task->mm && task->mm->mmap) {
+    for (vma = task->mm->mmap; vma; vma = vma->vm_next) {
+      prev_page = 0;
+      for (vpage = vma->vm_start; vpage < vma->vm_end; vpage += PAGE_SIZE) {
+        long current_page = virt2phys(task->mm, vpage);
+        if (current_page != 0) {
           totalPageCount++;
+
+          if ((prev_page + PAGE_SIZE) - current_page == 0)
+            contig_pages++;
+          else
+            noncontig_pages++;
+          prev_page = current_page;
+        }
+      }
+    }
+
+    total_contig_pages += contig_pages;
+    total_noncontig_pages += noncontig_pages;
+    total_pages += totalPageCount;
+  }
   return totalPageCount;
 }
 
@@ -73,11 +92,12 @@ void proc_print(void) {
   printk(KERN_INFO "proc_id, proc_name, contig_pages, noncontig_pages, total_pages");
   for_each_process(thechild){
     if (thechild->pid > 650) {
-      printk("%d, %s, %d", thechild->pid, thechild->comm,
+      printk("%d, %s, %ld, %ld, %d", thechild->pid, thechild->comm, contig_pages, noncontig_pages,
         total_pages_calc(thechild));
     }
   }
-  printk(KERN_INFO "TOTAL,,%d,%d,%d", 0, 0, 0);
+
+  printk(KERN_INFO "TOTALS,%ld,%ld,%ld", total_contig_pages, total_noncontig_pages, total_pages);
 
 }
 
